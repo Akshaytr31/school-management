@@ -9,19 +9,19 @@ from .serializers import StudentSerializer, UserSerializer, TeacherUserSerialize
 class CustomAuthToken(ObtainAuthToken):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
+
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
                                            context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
+        
+        # Using UserSerializer to format most of the response
+        user_data = UserSerializer(user).data
         return Response({
             'token': token.key,
-            'user_id': user.pk,
-            'email': user.email,
-            'username': user.username,
-            'is_teacher': user.groups.filter(name='Teacher').exists(),
-            'is_admin': user.is_staff
+            **user_data
         })
 
 class StudentListCreateView(generics.ListCreateAPIView):
@@ -35,36 +35,20 @@ class StudentListCreateView(generics.ListCreateAPIView):
             return Student.objects.all()
         return Student.objects.filter(teacher=user)
 
-    def perform_create(self, serializer):
-        serializer.save(teacher=self.request.user)
-
 class SignUpView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = TeacherUserSerializer
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
 
-    def post(self, request, *args, **kwargs):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        email = request.data.get('email', '')
-        
-        if not username or not password:
-            return Response({'error': 'Username and password required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if User.objects.filter(username=username).exists():
-            return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
-            
-        user = User.objects.create_user(username=username, password=password, email=email)
-        # Default new users to Teacher group for this project
-        teacher_group, _ = Group.objects.get_or_create(name='Teacher')
-        user.groups.add(teacher_group)
-        
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
         token, _ = Token.objects.get_or_create(user=user)
         
         return Response({
             'token': token.key,
-            'user_id': user.pk,
+            'user_id': user.id,
             'username': user.username,
             'message': 'Account created successfully'
         }, status=status.HTTP_201_CREATED)

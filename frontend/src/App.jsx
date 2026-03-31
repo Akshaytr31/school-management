@@ -8,20 +8,31 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 
-function App() {
-  const isAuthenticated = () => !!localStorage.getItem("token");
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = !!localStorage.getItem("token");
+  return isAuthenticated ? children : <Navigate to="/" />;
+};
 
+function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route
           path="/dashboard"
-          element={isAuthenticated() ? <Dashboard /> : <Navigate to="/" />}
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/admin-dashboard"
-          element={isAuthenticated() ? <AdminDashboard /> : <Navigate to="/" />}
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
         />
       </Routes>
     </Router>

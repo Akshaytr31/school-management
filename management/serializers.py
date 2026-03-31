@@ -71,6 +71,9 @@ class StudentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """
         Overrides create to set the teacher field from the current request user.
+        If user is not authenticated (though view should protect this), it will fail or handle as needed.
         """
-        validated_data['teacher'] = self.context['request'].user
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            validated_data['teacher'] = request.user
         return super().create(validated_data)
