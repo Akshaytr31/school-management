@@ -54,7 +54,7 @@ const AdminDashboard = () => {
     <Container maxW="container.xl" py={10}>
       <VStack spaceY={10} align="stretch">
         <HStack justify="space-between">
-          <Heading color="purple.700">Admin Dashboard</Heading>
+          <Heading color="var(--primary-dark)">Admin Dashboard</Heading>
           <Button
             variant="outline"
             onClick={() => {
@@ -74,7 +74,7 @@ const AdminDashboard = () => {
             bg="white"
             shadow="md"
             border="1px solid"
-            borderColor="gray.100"
+            borderColor="var(--light-gray)"
           >
             <VStack spaceY={4} align="stretch">
               <Heading size="md">Create Teacher Account</Heading>
@@ -114,7 +114,9 @@ const AdminDashboard = () => {
                   </Box>
                   <Button
                     type="submit"
-                    colorPalette="purple"
+                    bg="var(--primary)"
+                    color="white"
+                    _hover={{ bg: "var(--primary-dark)" }}
                     w="100%"
                     loading={loading}
                   >
@@ -154,7 +156,8 @@ const AdminDashboard = () => {
                           <Button
                             size="sm"
                             variant="ghost"
-                            colorPalette="blue"
+                            color="var(--primary)"
+                            _hover={{ bg: "var(--primary)", color: "white" }}
                             onClick={() => {
                               const newPassword = prompt(
                                 "Enter new password for " + teacher.username,

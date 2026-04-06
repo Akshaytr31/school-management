@@ -55,7 +55,7 @@ const Dashboard = () => {
     <Container maxW="container.xl" py={10}>
       <VStack spaceY={10} align="stretch">
         <HStack justify="space-between">
-          <Heading color="purple.700">Teacher Dashboard</Heading>
+          <Heading color="var(--primary-dark)">Teacher Dashboard</Heading>
           <Button
             variant="outline"
             onClick={() => {
@@ -75,7 +75,7 @@ const Dashboard = () => {
             bg="white"
             shadow="md"
             border="1px solid"
-            borderColor="gray.100"
+            borderColor="var(--light-gray)"
           >
             <VStack spaceY={4} align="stretch">
               <Heading size="md">Add New Student</Heading>
@@ -113,7 +113,9 @@ const Dashboard = () => {
                   </Box>
                   <Button
                     type="submit"
-                    colorPalette="purple"
+                    bg="var(--primary)"
+                    color="white"
+                    _hover={{ bg: "var(--primary-dark)" }}
                     w="100%"
                     loading={loading}
                   >

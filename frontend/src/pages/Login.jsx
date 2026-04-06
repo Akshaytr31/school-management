@@ -44,17 +44,17 @@ const Login = () => {
         p={8}
         borderRadius="xl"
         backdropFilter="blur(10px)"
-        bg="whiteAlpha.800"
+        bg="var(--glass-bg)"
         boxShadow="2xl"
         border="1px solid"
-        borderColor="whiteAlpha.400"
+        borderColor="var(--glass-border)"
         w="100%"
       >
         <VStack spaceY={6} align="stretch">
-          <Heading textAlign="center" color="purple.600">
+          <Heading textAlign="center" color="var(--primary)">
             School Project
           </Heading>
-          <Text textAlign="center" color="gray.600">
+          <Text textAlign="center" color="var(--gray)">
             Admin & Teacher Login
           </Text>
           <form onSubmit={handleLogin}>
@@ -84,7 +84,9 @@ const Login = () => {
               </Box>
               <Button
                 type="submit"
-                colorPalette="purple"
+                bg="var(--primary)"
+                color="white"
+                _hover={{ bg: "var(--primary-dark)" }}
                 w="100%"
                 loading={loading}
               >
