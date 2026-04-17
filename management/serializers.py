@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
-from .models import Student
+from .models import Student, Department, Class, Division, Admission
 
 class UserSerializer(serializers.ModelSerializer):
     """
@@ -77,3 +77,30 @@ class StudentSerializer(serializers.ModelSerializer):
         if request and hasattr(request, 'user'):
             validated_data['teacher'] = request.user
         return super().create(validated_data)
+
+class DepartmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Department
+        fields = '__all__'
+        read_only_fields = ['user']
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            validated_data['user'] = request.user
+        return super().create(validated_data)
+
+class ClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Class
+        fields = '__all__'
+
+class DivisionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Division
+        fields = '__all__'
+
+class AdmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Admission
+        fields = '__all__'
