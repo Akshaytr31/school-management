@@ -118,9 +118,9 @@ const AdminDashboard = () => {
                     color="white"
                     _hover={{ bg: "var(--primary-dark)" }}
                     w="100%"
-                    loading={loading}
+                    disabled={loading}
                   >
-                    Create Teacher
+                    {loading ? "Creating..." : "Create Teacher"}
                   </Button>
                 </VStack>
               </form>

@@ -88,9 +88,9 @@ const Login = () => {
                 color="white"
                 _hover={{ bg: "var(--primary-dark)" }}
                 w="100%"
-                loading={loading}
+                disabled={loading}
               >
-                Login
+                {loading ? "Logging in..." : "Login"}
               </Button>
             </VStack>
           </form>
