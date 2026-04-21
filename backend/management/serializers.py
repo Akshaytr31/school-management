@@ -1,6 +1,19 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
-from .models import Student, Department, Class, Division, Admission
+from .models import Student, Department, Class, Division, Admission, TeacherProfile, Subject
+
+class SubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subject
+        fields = '__all__'
+
+class TeacherProfileSerializer(serializers.ModelSerializer):
+    subject_details = SubjectSerializer(source='subjects', many=True, read_only=True)
+    subjects = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), many=True, required=False)
+
+    class Meta:
+        model = TeacherProfile
+        fields = ['full_name', 'qualification', 'phone_number', 'address', 'gender', 'date_of_birth', 'experience', 'joining_date', 'photo', 'subjects', 'subject_details']
 
 class UserSerializer(serializers.ModelSerializer):
     """
@@ -9,10 +22,11 @@ class UserSerializer(serializers.ModelSerializer):
     """
     is_teacher = serializers.SerializerMethodField()
     is_admin = serializers.BooleanField(source='is_staff', read_only=True)
+    profile = TeacherProfileSerializer(read_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'is_teacher', 'is_admin']
+        fields = ['id', 'username', 'email', 'is_teacher', 'is_admin', 'profile']
 
     def get_is_teacher(self, obj):
         """Checks if the user belongs to the 'Teacher' group."""
@@ -24,20 +38,29 @@ class TeacherUserSerializer(serializers.ModelSerializer):
     Handles password hashing and automatic group assignment.
     """
     password = serializers.CharField(write_only=True, required=False)
+    profile = TeacherProfileSerializer(required=False)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password']
+        fields = ['id', 'username', 'email', 'password', 'profile']
 
     def create(self, validated_data):
         """
-        Creates a new user, hashes the password, and adds them to the 'Teacher' group.
+        Creates a new user, hashes the password, creates a profile with subjects, and adds them to the 'Teacher' group.
         """
+        profile_data = validated_data.pop('profile', None)
         password = validated_data.pop('password', None)
         user = User.objects.create_user(**validated_data)
         if password:
             user.set_password(password)
             user.save()
+        
+        # Create TeacherProfile if data is provided
+        if profile_data:
+            subjects = profile_data.pop('subjects', [])
+            profile = TeacherProfile.objects.create(user=user, **profile_data)
+            if subjects:
+                profile.subjects.set(subjects)
         
         # Ensure the 'Teacher' group exists and add the user to it
         teacher_group, _ = Group.objects.get_or_create(name='Teacher')
@@ -46,9 +69,11 @@ class TeacherUserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        Updates an existing teacher's information and handles password updates securely.
+        Updates an existing teacher's information and handles password/profile/subjects updates securely.
         """
+        profile_data = validated_data.pop('profile', None)
         password = validated_data.pop('password', None)
+        
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         
@@ -56,6 +81,18 @@ class TeacherUserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         
         instance.save()
+
+        # Update TeacherProfile if data is provided
+        if profile_data:
+            subjects = profile_data.pop('subjects', None)
+            profile, _ = TeacherProfile.objects.get_or_create(user=instance)
+            for attr, value in profile_data.items():
+                setattr(profile, attr, value)
+            profile.save()
+            
+            if subjects is not None:
+                profile.subjects.set(subjects)
+            
         return instance
 
 class StudentSerializer(serializers.ModelSerializer):

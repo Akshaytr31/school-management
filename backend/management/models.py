@@ -121,3 +121,25 @@ class ClassroomSetup(models.Model):
 
     def __str__(self):
         return f"{self.department} - {self.class_name} - {self.division}"
+
+class TeacherProfile(models.Model):
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('Other', 'Other'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    full_name = models.CharField(max_length=255)
+    qualification = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=20)
+    address = models.TextField()
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    date_of_birth = models.DateField()
+    experience = models.CharField(max_length=255)
+    joining_date = models.DateField()
+    photo = models.ImageField(upload_to='teacher_photos', blank=True, null=True)
+    subjects = models.ManyToManyField(Subject, related_name='teachers', blank=True)
+
+    def __str__(self):
+        return self.full_name

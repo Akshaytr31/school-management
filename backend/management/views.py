@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import generics, permissions, status, viewsets
+from .models import Student, Department, Class, Division, Admission, Subject, TeacherProfile
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from .models import Student, Department, Class, Division, Admission
+from .models import Student, Department, Class, Division, Admission, Subject
 from .serializers import (
     StudentSerializer, UserSerializer, TeacherUserSerializer,
-    DepartmentSerializer, ClassSerializer, DivisionSerializer, AdmissionSerializer
+    DepartmentSerializer, ClassSerializer, DivisionSerializer, AdmissionSerializer, SubjectSerializer
 )
 
 class CustomAuthToken(ObtainAuthToken):
@@ -87,3 +88,23 @@ class AdmissionListCreateView(generics.ListCreateAPIView):
     queryset = Admission.objects.all()
     serializer_class = AdmissionSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+class SubjectListCreateView(generics.ListCreateAPIView):
+    queryset = Subject.objects.all()
+    serializer_class = SubjectSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class SubjectDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Subject.objects.all()
+    serializer_class = SubjectSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+class ClassDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Class.objects.all()
+    serializer_class = ClassSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+class DepartmentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+    permission_classes = [permissions.IsAdminUser]

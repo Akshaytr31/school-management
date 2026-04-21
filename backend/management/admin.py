@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Student, Department, Class, Division, Designation, Subject, Admission, ClassroomSetup
+from .models import Student, Department, Class, Division, Designation, Subject, Admission, ClassroomSetup, TeacherProfile
+
+@admin.register(TeacherProfile)
+class TeacherProfileAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'user', 'qualification', 'phone_number', 'experience')
+    search_fields = ('full_name', 'user__username', 'qualification')
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
