@@ -10,12 +10,34 @@ import {
   Container,
 } from "@chakra-ui/react";
 import api from "../api";
+import AlertModal from "../components/common/AlertModal";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Alert Modal State
+  const [alertConfig, setAlertConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info",
+  });
+
+  const showAlert = (type, title, message) => {
+    setAlertConfig({
+      isOpen: true,
+      type,
+      title,
+      message,
+    });
+  };
+
+  const closeAlert = () => {
+    setAlertConfig((prev) => ({ ...prev, isOpen: false }));
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -32,7 +54,11 @@ const Login = () => {
         navigate("/dashboard");
       }
     } catch (error) {
-      alert("Invalid credentials");
+      showAlert(
+        "error",
+        "Login Failed",
+        "Invalid credentials. Please check your username and password.",
+      );
     } finally {
       setLoading(false);
     }
@@ -96,6 +122,15 @@ const Login = () => {
           </form>
         </VStack>
       </Box>
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertConfig.isOpen}
+        onClose={closeAlert}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+      />
     </Container>
   );
 };

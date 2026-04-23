@@ -1,7 +1,7 @@
 import { Box, HStack, Heading, Text, VStack } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 
 const StatCard = ({ label, value, icon: Icon, color, delay }) => (
   <MotionBox
@@ -13,7 +13,7 @@ const StatCard = ({ label, value, icon: Icon, color, delay }) => (
     transition={{ delay }}
   >
     <HStack justify="space-between">
-      <VStack align="start" spaceY={1}>
+      <VStack align="start" gap={1}>
         <Text color="gray.500" fontWeight="medium">
           {label}
         </Text>

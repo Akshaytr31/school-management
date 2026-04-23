@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Grid,
   HStack,
   Heading,
   Text,
@@ -13,8 +12,17 @@ import {
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { Briefcase, Plus, Trash2 } from "lucide-react";
+import {
+  DialogBody,
+  DialogCloseTrigger,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogRoot,
+  DialogTitle,
+} from "../ui/dialog";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 
 const DepartmentsTab = ({
   departments,
@@ -24,6 +32,10 @@ const DepartmentsTab = ({
   // Form states
   newDeptName,
   setNewDeptName,
+  isOpen,
+  setIsOpen,
+  isEditMode,
+  onCardClick,
 }) => {
   return (
     <MotionBox
@@ -32,23 +44,44 @@ const DepartmentsTab = ({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
     >
-      <Grid templateColumns={{ base: "1fr", lg: "0.6fr 0.4fr" }} gap={8}>
-        {/* Departments List */}
-        <Box p={6} borderRadius="2xl" className="glass-card">
-          <VStack align="stretch" spaceY={6}>
-            <HStack justify="space-between">
-              <HStack spaceX={3}>
+      <VStack align="stretch" gap={6}>
+        {/* Departments Header & List */}
+        <Box
+          p={6}
+          borderRadius="2xl"
+          className="glass-card"
+          minH="calc(100vh - 120px)"
+        >
+          <VStack align="stretch" gap={6}>
+            <HStack justify="space-between" flexWrap="wrap" gap={4}>
+              <HStack gap={3}>
                 <Box bg="green.50" p={2} borderRadius="lg" color="green.500">
                   <Briefcase size={20} />
                 </Box>
-                <Heading size="md">All Departments</Heading>
+                <VStack align="start" gap={0}>
+                  <Heading size="md">All Departments</Heading>
+                  <Text fontSize="sm" color="gray.500">
+                    Manage school departments and faculties
+                  </Text>
+                </VStack>
               </HStack>
-              <Badge colorPalette="green" variant="subtle" borderRadius="lg">
-                {departments.length} Total
-              </Badge>
+              <HStack gap={3}>
+                <Badge colorPalette="green" variant="subtle" borderRadius="lg">
+                  {departments.length} Total
+                </Badge>
+                <Button
+                  bg="var(--primary)"
+                  color="white"
+                  borderRadius="xl"
+                  onClick={() => setIsOpen(true)}
+                  _hover={{ bg: "var(--primary-dark)" }}
+                >
+                  <Plus size={18} /> Add Department
+                </Button>
+              </HStack>
             </HStack>
 
-            <Box overflowX="auto">
+            <Box w="100%" overflowX="hidden">
               <Table.Root variant="simple">
                 <Table.Header>
                   <Table.Row borderBottom="2px solid var(--glass-border)">
@@ -65,8 +98,12 @@ const DepartmentsTab = ({
                   {departments.map((dept) => (
                     <Table.Row
                       key={dept.id}
-                      _hover={{ bg: "rgba(70, 101, 193, 0.05)" }}
+                      _hover={{
+                        bg: "rgba(70, 101, 193, 0.05)",
+                        cursor: "pointer",
+                      }}
                       transition="0.2s"
+                      onClick={() => onCardClick(dept)}
                     >
                       <Table.Cell fontWeight="medium">
                         {dept.department_name}
@@ -78,7 +115,10 @@ const DepartmentsTab = ({
                           variant="ghost"
                           color="red.500"
                           _hover={{ bg: "red.50" }}
-                          onClick={() => handleDeleteDept(dept.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteDept(dept.id);
+                          }}
                         >
                           <Trash2 size={14} />
                         </IconButton>
@@ -90,53 +130,7 @@ const DepartmentsTab = ({
             </Box>
           </VStack>
         </Box>
-
-        {/* Add Department Form */}
-        <Box p={6} borderRadius="2xl" className="glass-card">
-          <VStack align="stretch" spaceY={6}>
-            <HStack spaceX={3}>
-              <Box bg="green.50" p={2} borderRadius="lg" color="green.500">
-                <Plus size={20} />
-              </Box>
-              <Heading size="md">Add Department</Heading>
-            </HStack>
-            <form onSubmit={handleAddDept}>
-              <VStack spaceY={4}>
-                <VStack align="start" w="100%" spaceY={1}>
-                  <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                    Department Name
-                  </Text>
-                  <Input
-                    placeholder="e.g. Science"
-                    value={newDeptName}
-                    onChange={(e) => setNewDeptName(e.target.value)}
-                    variant="subtle"
-                    bg="white"
-                    borderRadius="xl"
-                    py={6}
-                    required
-                  />
-                </VStack>
-                <Button
-                  type="submit"
-                  bg="var(--primary)"
-                  color="white"
-                  w="100%"
-                  py={6}
-                  borderRadius="xl"
-                  isLoading={loading}
-                  _hover={{
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 8px 16px rgba(70, 101, 193, 0.2)",
-                  }}
-                >
-                  Create Department
-                </Button>
-              </VStack>
-            </form>
-          </VStack>
-        </Box>
-      </Grid>
+      </VStack>
     </MotionBox>
   );
 };

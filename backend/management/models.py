@@ -30,6 +30,7 @@ class Class(models.Model):
         ('Pre Primary', 'Pre Primary'),
     ]
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    class_teacher = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_classes')
     class_name = models.CharField(max_length=255)
     division = models.CharField(max_length=255, blank=True, null=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='Primary')
@@ -66,7 +67,7 @@ class Subject(models.Model):
     subject_name = models.CharField(max_length=255)
     subject_type = models.CharField(max_length=255)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='subjects')
-    class_name = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='subjects')
+    classes = models.ManyToManyField(Class, related_name='subjects')
 
     def __str__(self):
         return self.subject_name

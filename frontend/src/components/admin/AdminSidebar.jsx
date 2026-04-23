@@ -8,7 +8,7 @@ import {
   Folder,
 } from "lucide-react";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 
 const AdminSidebar = ({
   sidebarItems,
@@ -34,12 +34,17 @@ const AdminSidebar = ({
       p={6}
       display={{ base: "none", lg: "flex" }}
       flexDirection="column"
+      position="sticky"
+      top={0}
+      h="100vh"
+      overflowY="auto"
+      className="custom-scrollbar"
       initial={{ x: -280 }}
       animate={{ x: 0 }}
       transition={{ type: "spring", damping: 20 }}
     >
-      <VStack align="stretch" spaceY={8} h="100%">
-        <HStack spaceX={3}>
+      <VStack align="stretch" gap={8} minH="100%">
+        <HStack gap={3}>
           <Box bg="var(--primary)" p={2} borderRadius="xl" color="white">
             <GraduationCap size={24} />
           </Box>
@@ -48,7 +53,7 @@ const AdminSidebar = ({
           </Heading>
         </HStack>
 
-        <VStack align="stretch" spaceY={2} flex={1}>
+        <VStack align="stretch" gap={2} flex={1}>
           {sidebarItems.map((item) => {
             if (item.id === "classes") {
               const groupedByCat = classes.reduce((acc, cls) => {
@@ -60,7 +65,7 @@ const AdminSidebar = ({
               }, {});
 
               return (
-                <VStack key={item.id} align="stretch" spaceY={1}>
+                <VStack key={item.id} align="stretch" gap={1}>
                   <Button
                     variant={activeTab === "classes" ? "solid" : "ghost"}
                     bg={
@@ -85,7 +90,7 @@ const AdminSidebar = ({
                       setViewingStudents(false);
                     }}
                   >
-                    <HStack spaceX={3}>
+                    <HStack gap={3}>
                       <item.icon size={20} />
                       <Text fontWeight="medium">{item.label}</Text>
                     </HStack>
@@ -105,9 +110,9 @@ const AdminSidebar = ({
                         overflow="hidden"
                         pl={4}
                       >
-                        <VStack align="stretch" spaceY={1} py={1}>
+                        <VStack align="stretch" gap={1} py={1}>
                           {Object.keys(groupedByCat).map((cat) => (
-                            <VStack key={cat} align="stretch" spaceY={1}>
+                            <VStack key={cat} align="stretch" gap={1}>
                               <Button
                                 size="sm"
                                 variant="ghost"
@@ -123,7 +128,7 @@ const AdminSidebar = ({
                                   );
                                 }}
                               >
-                                <HStack spaceX={2}>
+                                <HStack gap={2}>
                                   <Folder size={16} />
                                   <Text fontSize="sm">{cat}</Text>
                                 </HStack>
@@ -135,7 +140,7 @@ const AdminSidebar = ({
                               </Button>
 
                               {expandedCategories.includes(cat) && (
-                                <VStack align="stretch" spaceY={0} pl={6}>
+                                <VStack align="stretch" gap={0} pl={6}>
                                   {Object.keys(groupedByCat[cat]).map(
                                     (className) => (
                                       <Button
@@ -193,7 +198,7 @@ const AdminSidebar = ({
                   color: activeTab === item.id ? "white" : "var(--primary)",
                 }}
                 justifyContent="flex-start"
-                spaceX={3}
+                gap={3}
                 py={6}
                 borderRadius="xl"
                 onClick={() => {
@@ -215,7 +220,7 @@ const AdminSidebar = ({
           color="red.500"
           _hover={{ bg: "red.50" }}
           justifyContent="flex-start"
-          spaceX={3}
+          gap={3}
           py={6}
           borderRadius="xl"
           onClick={handleLogout}

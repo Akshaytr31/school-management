@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -11,9 +12,20 @@ import {
   Badge,
   Flex,
   Table,
+  SimpleGrid,
   Spinner,
   Separator,
 } from "@chakra-ui/react";
+import {
+  DialogRoot,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+  DialogFooter,
+  DialogCloseTrigger,
+  DialogActionTrigger,
+} from "../ui/dialog";
 import { motion } from "framer-motion";
 import {
   GraduationCap,
@@ -24,7 +36,7 @@ import {
   Users,
 } from "lucide-react";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 
 const ClassesTab = ({
   classes,
@@ -49,7 +61,15 @@ const ClassesTab = ({
   setNewClassDivision,
   newClassCategory,
   setNewClassCategory,
+  isOpen,
+  setIsOpen,
+  isEditMode,
+  onCardClick,
 }) => {
+  const handleSubmit = (e) => {
+    handleAddClass(e);
+  };
+
   return (
     <MotionBox
       key="classes"
@@ -58,16 +78,21 @@ const ClassesTab = ({
       exit={{ opacity: 0, scale: 0.95 }}
     >
       {!viewingStudents ? (
-        <Grid templateColumns={{ base: "1fr", lg: "0.6fr 0.4fr" }} gap={8}>
+        <VStack align="stretch" gap={6}>
           {/* Classes Content */}
-          <Box p={6} borderRadius="2xl" className="glass-card">
-            <VStack align="stretch" spaceY={6}>
-              <HStack justify="space-between">
-                <HStack spaceX={3}>
+          <Box
+            p={6}
+            borderRadius="2xl"
+            className="glass-card"
+            minH="calc(100vh - 120px)"
+          >
+            <VStack align="stretch" gap={6} w="100%">
+              <HStack justify="space-between" flexWrap="wrap" gap={4}>
+                <HStack gap={3}>
                   <Box bg="blue.50" p={2} borderRadius="lg" color="blue.500">
                     <GraduationCap size={20} />
                   </Box>
-                  <VStack align="start" spaceY={0}>
+                  <VStack align="start" gap={0}>
                     <Heading size="md">
                       {selectedClassGroup
                         ? `${selectedClassGroup} Divisions`
@@ -80,16 +105,39 @@ const ClassesTab = ({
                     )}
                   </VStack>
                 </HStack>
-                <Badge colorPalette="blue" variant="subtle" borderRadius="lg">
-                  {selectedClassGroup
-                    ? classes.filter((c) => c.class_name === selectedClassGroup)
-                        .length
-                    : classes.length}{" "}
-                  Total
-                </Badge>
+                <HStack gap={4}>
+                  <Badge
+                    colorPalette="blue"
+                    variant="subtle"
+                    borderRadius="lg"
+                    px={3}
+                    py={1}
+                  >
+                    {selectedClassGroup
+                      ? classes.filter(
+                          (c) => c.class_name === selectedClassGroup,
+                        ).length
+                      : classes.length}{" "}
+                    Total
+                  </Badge>
+                  <Button
+                    size="sm"
+                    bg="var(--primary)"
+                    color="white"
+                    onClick={() => setIsOpen(true)}
+                    borderRadius="xl"
+                    px={6}
+                    _hover={{
+                      transform: "translateY(-1px)",
+                      boxShadow: "0 4px 12px rgba(70, 101, 193, 0.2)",
+                    }}
+                  >
+                    <Plus size={16} /> Add Class
+                  </Button>
+                </HStack>
               </HStack>
 
-              <Box overflowX="auto" w="100%">
+              <Box w="100%" overflowX="hidden">
                 {(selectedClassGroup
                   ? classes.filter((c) => c.class_name === selectedClassGroup)
                   : classes
@@ -97,10 +145,12 @@ const ClassesTab = ({
                   <Grid
                     templateColumns={{
                       base: "1fr",
-                      md: "repeat(2, 1fr)",
+                      sm: "repeat(2, 1fr)",
+                      md: "repeat(3, 1fr)",
                       lg: "repeat(3, 1fr)",
+                      xl: "repeat(4, 1fr)",
                     }}
-                    gap={4}
+                    gap={6}
                     w="100%"
                   >
                     {(selectedClassGroup
@@ -111,92 +161,105 @@ const ClassesTab = ({
                     ).map((cls) => (
                       <MotionBox
                         key={cls.id}
-                        p={4}
-                        borderRadius="xl"
+                        p={5}
+                        borderRadius="2xl"
                         bg="white"
                         border="1px solid"
                         borderColor="gray.100"
                         _hover={{
                           borderColor: "var(--primary)",
-                          transform: "translateY(-2px)",
-                          boxShadow: "lg",
+                          transform: "translateY(-4px)",
+                          boxShadow: "2xl",
                         }}
-                        transition="0.3s"
+                        transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
                         cursor="pointer"
-                        onClick={() => {
-                          setSelectedClass(cls);
-                          fetchClassStudents(cls.id);
-                        }}
+                        onClick={() => onCardClick(cls)}
                       >
-                        <VStack align="stretch" spaceY={3}>
+                        <VStack align="stretch" gap={4}>
                           <HStack justify="space-between">
                             <Box
-                              p={1.5}
+                              p={2}
                               bg="blue.50"
-                              borderRadius="md"
+                              borderRadius="xl"
                               color="blue.500"
                             >
-                              <GraduationCap size={16} />
+                              <GraduationCap size={18} />
                             </Box>
                             <IconButton
                               size="xs"
                               variant="ghost"
-                              color="red.500"
-                              _hover={{ bg: "red.50" }}
+                              color="red.400"
+                              _hover={{ bg: "red.50", color: "red.600" }}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteClass(cls.id);
                               }}
                             >
-                              <Trash2 size={12} />
+                              <Trash2 size={14} />
                             </IconButton>
                           </HStack>
 
-                          <VStack align="start" spaceY={0.5}>
+                          <VStack align="start" gap={1}>
                             <Heading
                               size="xs"
-                              color="gray.700"
+                              color="gray.800"
                               fontWeight="bold"
+                              letterSpacing="tight"
                             >
                               {cls.class_name}
                             </Heading>
-                            <HStack spaceX={1}>
+                            <HStack gap={2}>
                               <Badge
                                 colorPalette="blue"
                                 variant="subtle"
                                 fontSize="10px"
+                                px={2}
                               >
-                                Div: {cls.division || "N/A"}
+                                Division {cls.division || "N/A"}
                               </Badge>
                               <Badge
                                 colorPalette="purple"
                                 variant="subtle"
                                 fontSize="10px"
+                                px={2}
                               >
-                                {cls.category || "Primary"}
+                                {cls.category}
                               </Badge>
                             </HStack>
                           </VStack>
 
                           <HStack
                             justify="space-between"
-                            pt={1.5}
+                            pt={3}
                             borderTop="1px solid"
                             borderColor="gray.50"
                           >
-                            <Text fontSize="10px" color="gray.400">
+                            <Text
+                              fontSize="10px"
+                              color="gray.400"
+                              fontWeight="medium"
+                            >
                               ID: #{cls.id}
                             </Text>
                             <Button
                               size="xs"
                               variant="ghost"
                               color="var(--primary)"
-                              fontWeight="semibold"
+                              fontWeight="bold"
                               fontSize="xs"
                               h="auto"
                               p={0}
+                              _hover={{
+                                bg: "transparent",
+                                color: "var(--primary-dark)",
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedClass(cls);
+                                fetchClassStudents(cls.id);
+                              }}
                             >
-                              View <ChevronRight size={10} />
+                              View Students <ChevronRight size={12} />
                             </Button>
                           </HStack>
                         </VStack>
@@ -204,134 +267,36 @@ const ClassesTab = ({
                     ))}
                   </Grid>
                 ) : (
-                  <Flex direction="column" align="center" py={12}>
-                    <Users size={48} color="#CBD5E0" />
-                    <Text color="gray.400" mt={4}>
-                      No classes found in this category.
+                  <Flex
+                    direction="column"
+                    align="center"
+                    py={20}
+                    bg="gray.50"
+                    borderRadius="2xl"
+                  >
+                    <Users size={64} color="#CBD5E0" />
+                    <Heading size="sm" mt={6} color="gray.500">
+                      No Divisions Found
+                    </Heading>
+                    <Text color="gray.400" mt={2}>
+                      This category currently has no divisions set up.
                     </Text>
                   </Flex>
                 )}
               </Box>
             </VStack>
           </Box>
-
-          {/* Add Class Form */}
-          <Box p={8} borderRadius="2xl" className="glass-card">
-            <VStack align="stretch" spaceY={6}>
-              <HStack spaceX={3}>
-                <Box bg="blue.50" p={2} borderRadius="lg" color="blue.500">
-                  <Plus size={20} />
-                </Box>
-                <Heading size="md">Add New Class</Heading>
-              </HStack>
-              <form onSubmit={handleAddClass}>
-                <VStack spaceY={4}>
-                  <VStack align="start" w="100%" spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Class Name
-                    </Text>
-                    <Input
-                      placeholder="e.g. Class 10th"
-                      value={newClassName}
-                      onChange={(e) => setNewClassName(e.target.value)}
-                      variant="subtle"
-                      bg="white"
-                      borderRadius="xl"
-                      py={6}
-                      required
-                    />
-                  </VStack>
-
-                  <VStack align="start" w="100%" spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Division
-                    </Text>
-                    <Input
-                      placeholder="e.g. A"
-                      value={newClassDivision}
-                      onChange={(e) => setNewClassDivision(e.target.value)}
-                      variant="subtle"
-                      bg="white"
-                      borderRadius="xl"
-                      py={6}
-                      required
-                    />
-                  </VStack>
-
-                  <VStack align="start" w="100%" spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Class Category
-                    </Text>
-                    <select
-                      value={newClassCategory}
-                      onChange={(e) => setNewClassCategory(e.target.value)}
-                      required
-                      style={{
-                        width: "100%",
-                        padding: "12px",
-                        borderRadius: "12px",
-                        border: "1px solid var(--glass-border)",
-                        background: "white",
-                      }}
-                    >
-                      <option value="Senior Secondary">Senior Secondary</option>
-                      <option value="Secondary">Secondary</option>
-                      <option value="Middle">Middle</option>
-                      <option value="Primary">Primary</option>
-                      <option value="Pre Primary">Pre Primary</option>
-                    </select>
-                  </VStack>
-
-                  <VStack align="start" w="100%" spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Department
-                    </Text>
-                    <select
-                      value={newClassDept}
-                      onChange={(e) => setNewClassDept(e.target.value)}
-                      required
-                      style={{
-                        width: "100%",
-                        padding: "12px",
-                        borderRadius: "12px",
-                        border: "1px solid var(--glass-border)",
-                        background: "white",
-                      }}
-                    >
-                      <option value="">Select Department</option>
-                      {departments.map((dept) => (
-                        <option key={dept.id} value={dept.id}>
-                          {dept.department_name}
-                        </option>
-                      ))}
-                    </select>
-                  </VStack>
-
-                  <Button
-                    type="submit"
-                    bg="var(--primary)"
-                    color="white"
-                    w="100%"
-                    py={6}
-                    borderRadius="xl"
-                    isLoading={loading}
-                    _hover={{
-                      transform: "translateY(-2px)",
-                      boxShadow: "0 8px 16px rgba(70, 101, 193, 0.2)",
-                    }}
-                  >
-                    Create Class
-                  </Button>
-                </VStack>
-              </form>
-            </VStack>
-          </Box>
-        </Grid>
+        </VStack>
       ) : (
-        <Box p={8} borderRadius="2xl" className="glass-card">
-          <VStack align="stretch" spaceY={8}>
+        <Box
+          p={8}
+          borderRadius="2xl"
+          className="glass-card"
+          minH="calc(100vh - 120px)"
+        >
+          <VStack align="stretch" gap={8} w="100%">
             <HStack justify="space-between">
-              <HStack spaceX={4}>
+              <HStack gap={4}>
                 <Button
                   variant="ghost"
                   p={0}
@@ -341,7 +306,7 @@ const ClassesTab = ({
                   <ChevronLeft size={24} />
                 </Button>
                 <Separator orientation="vertical" h="30px" />
-                <VStack align="start" spaceY={0}>
+                <VStack align="start" gap={0}>
                   <HStack>
                     <Heading size="lg" color="var(--primary-dark)">
                       {selectedClass?.class_name}
@@ -366,7 +331,7 @@ const ClassesTab = ({
               </Badge>
             </HStack>
 
-            <Box overflowX="auto">
+            <Box w="100%" overflowX="hidden">
               {loadingStudents ? (
                 <Flex justify="center" py={20}>
                   <Spinner size="xl" color="var(--primary)" thickness="4px" />

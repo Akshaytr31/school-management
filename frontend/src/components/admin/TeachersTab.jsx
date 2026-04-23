@@ -12,12 +12,30 @@ import {
   Separator,
   IconButton,
   Badge,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { Users, UserPlus, User, Trash2, ChevronRight } from "lucide-react";
+import {
+  Users,
+  UserPlus,
+  User,
+  Trash2,
+  ChevronRight,
+  Mail,
+  Phone,
+  GraduationCap,
+} from "lucide-react";
+import {
+  DialogBody,
+  DialogCloseTrigger,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogRoot,
+  DialogTitle,
+} from "../ui/dialog";
 
-const MotionBox = motion(Box);
-const MotionHStack = motion(HStack);
+const MotionBox = motion.create(Box);
 
 const TeachersTab = ({
   teachers,
@@ -50,6 +68,10 @@ const TeachersTab = ({
   address,
   setAddress,
   selectedSubjects,
+  isOpen,
+  setIsOpen,
+  isEditMode,
+  onCardClick,
 }) => {
   return (
     <MotionBox
@@ -58,361 +80,189 @@ const TeachersTab = ({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
     >
-      <Grid templateColumns={{ base: "1fr", lg: "0.6fr 0.4fr" }} gap={8}>
-        {/* Add Teacher Form */}
-        <Box p={6} borderRadius="2xl" className="glass-card">
-          <VStack align="stretch" spaceY={6}>
-            <HStack spaceX={3}>
-              <Box bg="blue.50" p={2} borderRadius="lg" color="blue.500">
-                <UserPlus size={20} />
-              </Box>
-              <Heading size="md">Register Teacher</Heading>
-            </HStack>
-
-            <form onSubmit={handleAddTeacher}>
-              <VStack spaceY={4}>
-                <Stack
-                  direction={{ base: "column", md: "row" }}
-                  w="100%"
-                  spaceX={4}
-                >
-                  <VStack align="start" flex={1} spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Username
-                    </Text>
-                    <Input
-                      placeholder="e.g. johndoe"
-                      variant="subtle"
-                      bg="white"
-                      borderRadius="xl"
-                      value={newUsername}
-                      onChange={(e) => setNewUsername(e.target.value)}
-                      required
-                    />
-                  </VStack>
-                  <VStack align="start" flex={1} spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Password
-                    </Text>
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      variant="subtle"
-                      bg="white"
-                      borderRadius="xl"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      required
-                    />
-                  </VStack>
-                </Stack>
-
-                <Stack
-                  direction={{ base: "column", md: "row" }}
-                  w="100%"
-                  spaceX={4}
-                >
-                  <VStack align="start" flex={1} spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Full Name
-                    </Text>
-                    <Input
-                      placeholder="e.g. John Doe"
-                      variant="subtle"
-                      bg="white"
-                      borderRadius="xl"
-                      value={newFullName}
-                      onChange={(e) => setNewFullName(e.target.value)}
-                      required
-                    />
-                  </VStack>
-                  <VStack align="start" flex={1} spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Email
-                    </Text>
-                    <Input
-                      type="email"
-                      placeholder="john@school.com"
-                      variant="subtle"
-                      bg="white"
-                      borderRadius="xl"
-                      value={newEmail}
-                      onChange={(e) => setNewEmail(e.target.value)}
-                      required
-                    />
-                  </VStack>
-                </Stack>
-
-                <Stack
-                  direction={{ base: "column", md: "row" }}
-                  w="100%"
-                  spaceX={4}
-                >
-                  <VStack align="start" flex={1} spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Qualification
-                    </Text>
-                    <Input
-                      variant="subtle"
-                      bg="white"
-                      borderRadius="xl"
-                      value={qualification}
-                      onChange={(e) => setQualification(e.target.value)}
-                      required
-                    />
-                  </VStack>
-                  <VStack align="start" flex={1} spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Phone
-                    </Text>
-                    <Input
-                      variant="subtle"
-                      bg="white"
-                      borderRadius="xl"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      required
-                    />
-                  </VStack>
-                </Stack>
-
-                <Stack
-                  direction={{ base: "column", md: "row" }}
-                  w="100%"
-                  spaceX={4}
-                >
-                  <VStack align="start" flex={1} spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Gender
-                    </Text>
-                    <select
-                      value={gender}
-                      onChange={(e) => setGender(e.target.value)}
-                      style={{
-                        width: "100%",
-                        padding: "10px",
-                        borderRadius: "12px",
-                        border: "none",
-                        background: "white",
-                        fontSize: "14px",
-                        color: "#4A5568",
-                      }}
-                    >
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </VStack>
-                  <VStack align="start" flex={1} spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Date of Birth
-                    </Text>
-                    <Input
-                      type="date"
-                      variant="subtle"
-                      bg="white"
-                      borderRadius="xl"
-                      value={dob}
-                      onChange={(e) => setDob(e.target.value)}
-                    />
-                  </VStack>
-                </Stack>
-
-                <Stack
-                  direction={{ base: "column", md: "row" }}
-                  w="100%"
-                  spaceX={4}
-                >
-                  <VStack align="start" flex={1} spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Experience
-                    </Text>
-                    <Input
-                      variant="subtle"
-                      bg="white"
-                      borderRadius="xl"
-                      value={experience}
-                      onChange={(e) => setExperience(e.target.value)}
-                      placeholder="e.g. 5 Years"
-                    />
-                  </VStack>
-                  <VStack align="start" flex={1} spaceY={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                      Joining Date
-                    </Text>
-                    <Input
-                      type="date"
-                      variant="subtle"
-                      bg="white"
-                      borderRadius="xl"
-                      value={joiningDate}
-                      onChange={(e) => setJoiningDate(e.target.value)}
-                    />
-                  </VStack>
-                </Stack>
-
-                <VStack align="start" w="100%" spaceY={1}>
-                  <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                    Address
-                  </Text>
-                  <Textarea
-                    variant="subtle"
-                    bg="white"
-                    borderRadius="xl"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Full Residence Address"
-                    rows={3}
-                  />
-                </VStack>
-
-                <Box w="100%">
-                  <Text
-                    fontSize="sm"
-                    fontWeight="medium"
-                    color="gray.600"
-                    mb={2}
-                  >
-                    Select Subjects
-                  </Text>
-                  <Box
-                    border="1px solid var(--glass-border)"
-                    borderRadius="xl"
-                    p={3}
-                    maxH="120px"
-                    overflowY="auto"
-                    bg="white"
-                  >
-                    {allSubjects.map((sub) => (
-                      <HStack key={sub.id} mb={1}>
-                        <input
-                          type="checkbox"
-                          id={`teacher-sub-${sub.id}`}
-                          checked={selectedSubjects.includes(sub.id)}
-                          onChange={() => handleSubjectChange(sub.id)}
-                        />
-                        <label
-                          htmlFor={`teacher-sub-${sub.id}`}
-                          style={{ fontSize: "13px" }}
-                        >
-                          {sub.subject_name}
-                        </label>
-                      </HStack>
-                    ))}
-                  </Box>
+      <VStack align="stretch" gap={6}>
+        {/* Header & Stats Section */}
+        <Box
+          p={6}
+          borderRadius="2xl"
+          className="glass-card"
+          bg="linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)"
+          color="white"
+        >
+          <HStack justify="space-between" flexWrap="wrap" gap={6}>
+            <VStack align="start" gap={2} flex={1}>
+              <HStack gap={3}>
+                <Box bg="whiteAlpha.200" p={2} borderRadius="lg">
+                  <Users size={24} />
                 </Box>
-
-                <Button
-                  type="submit"
-                  bg="var(--primary)"
-                  color="white"
-                  w="100%"
-                  py={6}
-                  borderRadius="xl"
-                  isLoading={loading}
-                  _hover={{
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 8px 16px rgba(70, 101, 193, 0.2)",
-                  }}
-                >
-                  Create Account
-                </Button>
-              </VStack>
-            </form>
-          </VStack>
-        </Box>
-
-        {/* Teacher Stats/List */}
-        <VStack spaceY={6} align="stretch">
-          <Box
-            p={6}
-            borderRadius="2xl"
-            className="glass-card"
-            bg="linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)"
-            color="white"
-          >
-            <VStack align="start" spaceY={4}>
-              <Heading size="md">Teacher Directory</Heading>
-              <Text opacity={0.8}>
-                Manage all registered teachers and their access credentials from
-                this panel.
+                <Heading size="lg">Teacher Directory</Heading>
+              </HStack>
+              <Text opacity={0.9} maxW="600px">
+                Manage your academic staff, their credentials, and subject
+                assignments from this central hub.
               </Text>
-              <HStack spaceX={4}>
-                <VStack align="center">
-                  <Heading size="lg">{teachers.length}</Heading>
-                  <Text fontSize="xs" opacity={0.7}>
-                    Active Teachers
+              <HStack gap={8} pt={2}>
+                <VStack align="start" gap={0}>
+                  <Text fontSize="2xl" fontWeight="bold">
+                    {teachers.length}
+                  </Text>
+                  <Text
+                    fontSize="xs"
+                    opacity={0.7}
+                    fontWeight="medium"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
+                    Registered Teachers
                   </Text>
                 </VStack>
-                <Separator orientation="vertical" h="40px" />
-                <VStack align="center">
-                  <Heading size="lg">{allSubjects.length}</Heading>
-                  <Text fontSize="xs" opacity={0.7}>
-                    Subjects Offered
+                <Separator
+                  orientation="vertical"
+                  h="40px"
+                  borderColor="whiteAlpha.300"
+                />
+                <VStack align="start" gap={0}>
+                  <Text fontSize="2xl" fontWeight="bold">
+                    {allSubjects.length}
+                  </Text>
+                  <Text
+                    fontSize="xs"
+                    opacity={0.7}
+                    fontWeight="medium"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
+                    Active Subjects
                   </Text>
                 </VStack>
               </HStack>
             </VStack>
-          </Box>
+            <Button
+              size="lg"
+              bg="white"
+              color="var(--primary)"
+              px={8}
+              borderRadius="xl"
+              fontWeight="bold"
+              onClick={() => setIsOpen(true)}
+              _hover={{ bg: "gray.100", transform: "translateY(-2px)" }}
+              _active={{ transform: "translateY(0)" }}
+            >
+              <HStack gap={2}>
+                <UserPlus size={20} />
+                <Text>Add New Teacher</Text>
+              </HStack>
+            </Button>
+          </HStack>
+        </Box>
 
-          <Box p={6} borderRadius="2xl" className="glass-card">
-            <Heading size="sm" mb={4}>
-              Detailed List
+        {/* Teachers Grid */}
+        <Box
+          p={6}
+          borderRadius="2xl"
+          className="glass-card"
+          minH="calc(100vh - 350px)"
+        >
+          <VStack align="stretch" gap={6}>
+            <Heading size="md" color="gray.700">
+              Detailed Faculty List
             </Heading>
-            {teachers.map((teacher, idx) => (
-              <MotionHStack
-                key={teacher.id}
-                p={3}
-                borderRadius="xl"
-                _hover={{ bg: "rgba(0,0,0,0.02)" }}
-                justify="space-between"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-              >
-                <HStack spaceX={3}>
-                  <Box
-                    w={10}
-                    h={10}
-                    borderRadius="full"
-                    bg="gray.100"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <User size={20} color="gray" />
-                  </Box>
-                  <VStack align="start" spaceY={0}>
-                    <Text fontWeight="bold" fontSize="sm">
-                      {teacher.profile?.full_name}
-                    </Text>
-                    <Text fontSize="xs" color="gray.500">
-                      {teacher.email}
-                    </Text>
+            <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={6}>
+              {teachers.map((teacher, idx) => (
+                <MotionBox
+                  key={teacher.id}
+                  p={5}
+                  borderRadius="2xl"
+                  bg="white"
+                  border="1px solid"
+                  borderColor="gray.100"
+                  boxShadow="sm"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  cursor="pointer"
+                  onClick={() => onCardClick(teacher)}
+                  _hover={{
+                    transform: "translateY(-4px)",
+                    boxShadow: "md",
+                    borderColor: "var(--primary-light)",
+                  }}
+                >
+                  <VStack align="stretch" gap={4}>
+                    <HStack justify="space-between">
+                      <HStack gap={3}>
+                        <Box
+                          w={12}
+                          h={12}
+                          borderRadius="full"
+                          bg="blue.50"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <User size={24} color="#3182CE" />
+                        </Box>
+                        <VStack align="start" gap={0}>
+                          <Text fontWeight="bold" fontSize="md" noOfLines={1}>
+                            {teacher.profile?.full_name || teacher.username}
+                          </Text>
+                          <Badge size="xs" colorPalette="blue" variant="subtle">
+                            ID: #{teacher.id}
+                          </Badge>
+                        </VStack>
+                      </HStack>
+                      <IconButton
+                        size="sm"
+                        variant="ghost"
+                        color="red.500"
+                        _hover={{ bg: "red.50" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteTeacher(teacher.id);
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </IconButton>
+                    </HStack>
+
+                    <Separator />
+
+                    <VStack align="start" gap={2}>
+                      <HStack gap={2} color="gray.600">
+                        <Mail size={14} />
+                        <Text fontSize="xs" noOfLines={1}>
+                          {teacher.email}
+                        </Text>
+                      </HStack>
+                      <HStack gap={2} color="gray.600">
+                        <Phone size={14} />
+                        <Text fontSize="xs">
+                          {teacher.profile?.phone_number || "N/A"}
+                        </Text>
+                      </HStack>
+                      <HStack gap={2} color="gray.600">
+                        <GraduationCap size={14} />
+                        <Text fontSize="xs" noOfLines={1}>
+                          {teacher.profile?.qualification || "N/A"}
+                        </Text>
+                      </HStack>
+                    </VStack>
+
+                    <HStack justify="flex-end" pt={2}>
+                      <Button size="xs" variant="ghost" color="var(--primary)">
+                        <HStack gap={1}>
+                          <Text>View Profile</Text>
+                          <ChevronRight size={14} />
+                        </HStack>
+                      </Button>
+                    </HStack>
                   </VStack>
-                </HStack>
-                <HStack spaceX={1}>
-                  <IconButton
-                    size="xs"
-                    variant="ghost"
-                    color="red.500"
-                    _hover={{ bg: "red.50" }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteTeacher(teacher.id);
-                    }}
-                  >
-                    <Trash2 size={14} />
-                  </IconButton>
-                  <IconButton size="xs" variant="ghost">
-                    <ChevronRight size={14} />
-                  </IconButton>
-                </HStack>
-              </MotionHStack>
-            ))}
-          </Box>
-        </VStack>
-      </Grid>
+                </MotionBox>
+              ))}
+            </SimpleGrid>
+          </VStack>
+        </Box>
+      </VStack>
     </MotionBox>
   );
 };

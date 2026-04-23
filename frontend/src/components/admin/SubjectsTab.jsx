@@ -9,12 +9,23 @@ import {
   Input,
   IconButton,
   Badge,
+  Stack,
 } from "@chakra-ui/react";
+import { Checkbox } from "../ui/checkbox";
 import { motion } from "framer-motion";
 import { BookOpen, Plus, Book, Trash2, ChevronRight } from "lucide-react";
+import {
+  DialogBody,
+  DialogCloseTrigger,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogRoot,
+  DialogTitle,
+} from "../ui/dialog";
 
-const MotionBox = motion(Box);
-const MotionHStack = motion(HStack);
+const MotionBox = motion.create(Box);
+const MotionHStack = motion.create(HStack);
 
 const SubjectsTab = ({
   allSubjects,
@@ -30,8 +41,12 @@ const SubjectsTab = ({
   setNewSubjectType,
   newSubjectDept,
   setNewSubjectDept,
-  newSubjectClass,
-  setNewSubjectClass,
+  newSubjectClasses,
+  setNewSubjectClasses,
+  isOpen,
+  setIsOpen,
+  isEditMode,
+  onCardClick,
 }) => {
   return (
     <MotionBox
@@ -40,181 +55,121 @@ const SubjectsTab = ({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
     >
-      <Grid templateColumns={{ base: "1fr", lg: "0.4fr 0.6fr" }} gap={8}>
-        {/* Add Subject Form */}
-        <Box p={6} borderRadius="2xl" className="glass-card">
-          <VStack align="stretch" spaceY={6}>
-            <HStack spaceX={3}>
-              <Box bg="purple.50" p={2} borderRadius="lg" color="purple.500">
-                <Plus size={20} />
-              </Box>
-              <Heading size="md">Add New Subject</Heading>
-            </HStack>
-            <form onSubmit={handleAddSubject}>
-              <VStack spaceY={4}>
-                <VStack align="start" w="100%" spaceY={1}>
-                  <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                    Subject Name
-                  </Text>
-                  <Input
-                    placeholder="e.g. Mathematics"
-                    value={newSubjectName}
-                    onChange={(e) => setNewSubjectName(e.target.value)}
-                    variant="subtle"
-                    bg="white"
-                    borderRadius="xl"
-                    py={6}
-                    required
-                  />
-                </VStack>
-
-                <VStack align="start" w="100%" spaceY={1}>
-                  <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                    Subject Type
-                  </Text>
-                  <Input
-                    placeholder="e.g. Core, Elective"
-                    value={newSubjectType}
-                    onChange={(e) => setNewSubjectType(e.target.value)}
-                    variant="subtle"
-                    bg="white"
-                    borderRadius="xl"
-                    py={6}
-                    required
-                  />
-                </VStack>
-
-                <VStack align="start" w="100%" spaceY={1}>
-                  <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                    Department
-                  </Text>
-                  <select
-                    value={newSubjectDept}
-                    onChange={(e) => setNewSubjectDept(e.target.value)}
-                    required
-                    style={{
-                      width: "100%",
-                      padding: "12px",
-                      borderRadius: "12px",
-                      border: "1px solid var(--glass-border)",
-                      background: "white",
-                    }}
-                  >
-                    <option value="">Select Department</option>
-                    {departments.map((dept) => (
-                      <option key={dept.id} value={dept.id}>
-                        {dept.department_name}
-                      </option>
-                    ))}
-                  </select>
-                </VStack>
-
-                <VStack align="start" w="100%" spaceY={1}>
-                  <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                    Class
-                  </Text>
-                  <select
-                    value={newSubjectClass}
-                    onChange={(e) => setNewSubjectClass(e.target.value)}
-                    required
-                    style={{
-                      width: "100%",
-                      padding: "12px",
-                      borderRadius: "12px",
-                      border: "1px solid var(--glass-border)",
-                      background: "white",
-                    }}
-                  >
-                    <option value="">Select Class</option>
-                    {classes.map((cls) => (
-                      <option key={cls.id} value={cls.id}>
-                        {cls.class_name} - {cls.division}
-                      </option>
-                    ))}
-                  </select>
-                </VStack>
-
-                <Button
-                  type="submit"
-                  bg="var(--primary)"
-                  color="white"
-                  w="100%"
-                  py={6}
-                  borderRadius="xl"
-                  isLoading={loading}
-                >
-                  Create Subject
-                </Button>
-              </VStack>
-            </form>
-          </VStack>
-        </Box>
-
-        {/* Subjects List */}
-        <Box p={6} borderRadius="2xl" className="glass-card">
-          <VStack align="stretch" spaceY={6}>
-            <HStack justify="space-between">
-              <HStack spaceX={3}>
+      <VStack align="stretch" gap={6}>
+        {/* Subjects Header & List */}
+        <Box
+          p={6}
+          borderRadius="2xl"
+          className="glass-card"
+          minH="calc(100vh - 120px)"
+        >
+          <VStack align="stretch" gap={6}>
+            <HStack justify="space-between" flexWrap="wrap" gap={4}>
+              <HStack gap={3}>
                 <Box bg="purple.50" p={2} borderRadius="lg" color="purple.500">
                   <BookOpen size={20} />
                 </Box>
-                <Heading size="md">All Subjects</Heading>
+                <VStack align="start" gap={0}>
+                  <Heading size="md">All Subjects</Heading>
+                  <Text fontSize="sm" color="gray.500">
+                    Manage available subjects and class assignments
+                  </Text>
+                </VStack>
               </HStack>
-              <Badge colorPalette="purple" variant="subtle" borderRadius="lg">
-                {allSubjects.length} Total
-              </Badge>
+              <HStack gap={3}>
+                <Badge colorPalette="purple" variant="subtle" borderRadius="lg">
+                  {allSubjects.length} Total
+                </Badge>
+                <Button
+                  bg="var(--primary)"
+                  color="white"
+                  borderRadius="xl"
+                  onClick={() => setIsOpen(true)}
+                  _hover={{ bg: "var(--primary-dark)" }}
+                >
+                  <Plus size={18} /> Add Subject
+                </Button>
+              </HStack>
             </HStack>
 
-            <Box overflowY="auto" maxH="600px">
-              {allSubjects.map((sub, idx) => (
-                <MotionHStack
-                  key={sub.id}
-                  p={4}
-                  borderRadius="xl"
-                  _hover={{ bg: "rgba(0,0,0,0.02)" }}
-                  justify="space-between"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  borderBottom="1px solid"
-                  borderColor="gray.50"
-                >
-                  <HStack spaceX={4}>
-                    <Box bg="gray.50" p={2} borderRadius="lg">
-                      <Book size={18} color="#6B46C1" />
-                    </Box>
-                    <VStack align="start" spaceY={0}>
-                      <Text fontWeight="bold">{sub.subject_name}</Text>
-                      <HStack>
-                        <Badge size="sm" variant="outline" colorPalette="gray">
-                          {sub.subject_type}
-                        </Badge>
-                        <Text fontSize="xs" color="gray.500">
-                          ID: #{sub.id}
-                        </Text>
+            <Box w="100%" overflowX="hidden">
+              <Grid
+                templateColumns={{
+                  base: "1fr",
+                  sm: "repeat(2, 1fr)",
+                  md: "repeat(2, 1fr)",
+                  lg: "repeat(3, 1fr)",
+                  xl: "repeat(4, 1fr)",
+                }}
+                gap={6}
+              >
+                {allSubjects.map((sub, idx) => (
+                  <MotionBox
+                    key={sub.id}
+                    p={5}
+                    borderRadius="2xl"
+                    bg="white"
+                    border="1px solid"
+                    borderColor="gray.100"
+                    boxShadow="sm"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    position="relative"
+                    cursor="pointer"
+                    onClick={() => onCardClick(sub)}
+                    _hover={{ transform: "translateY(-4px)", boxShadow: "md" }}
+                  >
+                    <VStack align="start" gap={4}>
+                      <HStack justify="space-between" w="100%">
+                        <Box bg="purple.50" p={2} borderRadius="lg">
+                          <Book size={20} color="#6B46C1" />
+                        </Box>
+                        <IconButton
+                          size="xs"
+                          variant="ghost"
+                          color="red.500"
+                          _hover={{ bg: "red.50" }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteSubject(sub.id);
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </IconButton>
                       </HStack>
+                      <VStack align="start" gap={1}>
+                        <Text fontWeight="bold" fontSize="md">
+                          {sub.subject_name}
+                        </Text>
+                        <HStack flexWrap="wrap" gap={1}>
+                          <Badge
+                            size="xs"
+                            variant="outline"
+                            colorPalette="gray"
+                          >
+                            {sub.subject_type}
+                          </Badge>
+                          <Badge
+                            size="xs"
+                            colorPalette="purple"
+                            variant="subtle"
+                          >
+                            {sub.classes?.length || 0} Classes
+                          </Badge>
+                        </HStack>
+                      </VStack>
+                      <Text fontSize="xs" color="gray.400">
+                        ID: #{sub.id}
+                      </Text>
                     </VStack>
-                  </HStack>
-                  <HStack>
-                    <IconButton
-                      size="xs"
-                      variant="ghost"
-                      color="red.500"
-                      _hover={{ bg: "red.50" }}
-                      onClick={() => handleDeleteSubject(sub.id)}
-                    >
-                      <Trash2 size={14} />
-                    </IconButton>
-                    <IconButton size="xs" variant="ghost">
-                      <ChevronRight size={14} />
-                    </IconButton>
-                  </HStack>
-                </MotionHStack>
-              ))}
+                  </MotionBox>
+                ))}
+              </Grid>
             </Box>
           </VStack>
         </Box>
-      </Grid>
+      </VStack>
     </MotionBox>
   );
 };

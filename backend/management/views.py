@@ -95,6 +95,23 @@ class AdmissionListCreateView(generics.ListCreateAPIView):
             queryset = queryset.filter(class_name_id=class_id)
         return queryset
 
+    def perform_create(self, serializer):
+        user = self.request.user
+        class_obj = serializer.validated_data.get('class_name')
+        
+        # Admins have full access
+        if user.is_staff or user.is_superuser:
+            serializer.save()
+            return
+            
+        # Teacher must be the assigned class teacher
+        if class_obj and class_obj.class_teacher == user:
+            serializer.save()
+            return
+
+        from rest_framework.exceptions import PermissionDenied
+        raise PermissionDenied("Only an Admin or the assigned Class Teacher can add students to this class.")
+
 class SubjectListCreateView(generics.ListCreateAPIView):
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer

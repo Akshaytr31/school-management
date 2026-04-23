@@ -33,8 +33,12 @@ class DesignationAdmin(admin.ModelAdmin):
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
-    list_display = ('subject_name', 'subject_type', 'department', 'class_name')
+    list_display = ('subject_name', 'subject_type', 'department', 'get_classes')
     search_fields = ('subject_name',)
+
+    def get_classes(self, obj):
+        return ", ".join([str(c) for c in obj.classes.all()])
+    get_classes.short_description = 'Classes'
 
 @admin.register(Admission)
 class AdmissionAdmin(admin.ModelAdmin):

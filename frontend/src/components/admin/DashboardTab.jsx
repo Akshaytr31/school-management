@@ -10,12 +10,52 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { Plus, Users, BookOpen, Briefcase } from "lucide-react";
-import StatCard from "./StatCard";
+import {
+  Plus,
+  Users,
+  BookOpen,
+  Briefcase,
+  GraduationCap,
+  Wallet,
+  TrendingUp,
+  TrendingDown,
+  CreditCard,
+} from "lucide-react";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 
-const DashboardTab = ({ teachers, allSubjects, departments }) => {
+const OverviewMiniCard = ({ label, value, icon: Icon, color }) => (
+  <HStack
+    p={4}
+    borderRadius="xl"
+    border="1px solid"
+    borderColor="gray.100"
+    bg="gray.50"
+    _hover={{ bg: "gray.100" }}
+    transition="0.2s"
+    gap={4}
+  >
+    <Box p={3} borderRadius="lg" bg={`${color}.100`} color={`${color}.600`}>
+      <Icon size={20} />
+    </Box>
+    <VStack align="start" gap={0}>
+      <Text fontSize="xl" fontWeight="bold" color="gray.800">
+        {value}
+      </Text>
+      <Text fontSize="sm" color="gray.500" fontWeight="medium">
+        {label}
+      </Text>
+    </VStack>
+  </HStack>
+);
+
+const DashboardTab = ({
+  teachers,
+  allSubjects,
+  departments,
+  classes = [],
+  admissions = [],
+}) => {
   return (
     <MotionBox
       key="dashboard"
@@ -24,7 +64,7 @@ const DashboardTab = ({ teachers, allSubjects, departments }) => {
       exit={{ opacity: 0, y: -20 }}
     >
       <HStack justify="space-between" mb={8}>
-        <VStack align="start" spaceY={1}>
+        <VStack align="start" gap={1}>
           <Heading size="lg" color="var(--primary-dark)">
             Dashboard Overview
           </Heading>
@@ -36,7 +76,7 @@ const DashboardTab = ({ teachers, allSubjects, departments }) => {
             color="white"
             _hover={{ bg: "var(--primary-dark)" }}
             borderRadius="xl"
-            spaceX={2}
+            gap={2}
           >
             <Plus size={18} />
             <Text>Quick Action</Text>
@@ -44,32 +84,86 @@ const DashboardTab = ({ teachers, allSubjects, departments }) => {
         </HStack>
       </HStack>
 
-      <Grid
-        templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }}
-        gap={6}
-        mb={10}
-      >
-        <StatCard
-          label="Total Teachers"
-          value={teachers.length}
-          icon={Users}
-          color="blue"
-          delay={0.1}
-        />
-        <StatCard
-          label="Total Subjects"
-          value={allSubjects.length}
-          icon={BookOpen}
-          color="purple"
-          delay={0.2}
-        />
-        <StatCard
-          label="Departments"
-          value={departments.length}
-          icon={Briefcase}
-          color="orange"
-          delay={0.3}
-        />
+      <Grid templateColumns={{ base: "1fr", lg: "1fr 1fr" }} gap={6} mb={10}>
+        {/* Institute Overview Card */}
+        <Box
+          p={6}
+          borderRadius="2xl"
+          className="glass-card"
+          border="1px solid"
+          borderColor="gray.100"
+          boxShadow="sm"
+        >
+          <Heading size="md" mb={6} color="gray.800">
+            Institute Overview
+          </Heading>
+          <Grid templateColumns={{ base: "1fr", sm: "1fr 1fr" }} gap={4}>
+            <OverviewMiniCard
+              label="Total Teachers"
+              value={teachers.length}
+              icon={Users}
+              color="blue"
+            />
+            <OverviewMiniCard
+              label="Students"
+              value={admissions.length}
+              icon={GraduationCap}
+              color="purple"
+            />
+            <OverviewMiniCard
+              label="Class Teachers"
+              value={classes.length}
+              icon={BookOpen}
+              color="orange"
+            />
+            <OverviewMiniCard
+              label="Non-teaching Staffs"
+              value={15} // Mock data
+              icon={Briefcase}
+              color="green"
+            />
+          </Grid>
+        </Box>
+
+        {/* Financial Overview Card */}
+        <Box
+          p={6}
+          borderRadius="2xl"
+          className="glass-card"
+          border="1px solid"
+          borderColor="gray.100"
+          boxShadow="sm"
+        >
+          <Heading size="md" mb={6} color="gray.800">
+            Financial Overview
+          </Heading>
+          <Grid templateColumns={{ base: "1fr", sm: "1fr 1fr" }} gap={4}>
+            <OverviewMiniCard
+              label="Monthly Income"
+              value="₹4,50,000"
+              icon={Wallet}
+              color="green"
+            />
+            <OverviewMiniCard
+              label="Net Expenses"
+              value="₹2,10,000"
+              icon={TrendingDown}
+              color="red"
+            />
+            <OverviewMiniCard
+              label="Net Profit"
+              value="₹2,40,000"
+              icon={TrendingUp}
+              color="blue"
+            />
+            <OverviewMiniCard
+              label="Pending Fees"
+              value="₹75,000"
+              icon={CreditCard}
+              color="orange"
+            />
+          </Grid>
+        </Box>
       </Grid>
 
       <Grid templateColumns={{ base: "1fr", lg: "1.2fr 0.8fr" }} gap={8}>
@@ -103,7 +197,7 @@ const DashboardTab = ({ teachers, allSubjects, departments }) => {
                     transition="0.2s"
                   >
                     <Table.Cell>
-                      <HStack spaceX={3}>
+                      <HStack gap={3}>
                         <Box
                           w={8}
                           h={8}
