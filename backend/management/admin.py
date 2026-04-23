@@ -18,8 +18,8 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 @admin.register(Class)
 class ClassAdmin(admin.ModelAdmin):
-    list_display = ('class_name', 'department', 'status', 'created_at')
-    search_fields = ('class_name',)
+    list_display = ('class_name', 'division', 'category', 'department', 'status', 'created_at')
+    search_fields = ('class_name', 'division')
 
 @admin.register(Division)
 class DivisionAdmin(admin.ModelAdmin):

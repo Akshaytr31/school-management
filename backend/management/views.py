@@ -85,9 +85,15 @@ class DivisionListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 class AdmissionListCreateView(generics.ListCreateAPIView):
-    queryset = Admission.objects.all()
     serializer_class = AdmissionSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Admission.objects.all()
+        class_id = self.request.query_params.get('class_id')
+        if class_id:
+            queryset = queryset.filter(class_name_id=class_id)
+        return queryset
 
 class SubjectListCreateView(generics.ListCreateAPIView):
     queryset = Subject.objects.all()

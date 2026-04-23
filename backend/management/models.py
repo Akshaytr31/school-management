@@ -22,17 +22,28 @@ class Department(models.Model):
         return self.department_name
 
 class Class(models.Model):
+    CATEGORY_CHOICES = [
+        ('Senior Secondary', 'Senior Secondary'),
+        ('Secondary', 'Secondary'),
+        ('Middle', 'Middle'),
+        ('Primary', 'Primary'),
+        ('Pre Primary', 'Pre Primary'),
+    ]
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     class_name = models.CharField(max_length=255)
+    division = models.CharField(max_length=255, blank=True, null=True)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='Primary')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.BooleanField(default=True)
 
     def __str__(self):
+        if self.division:
+            return f"{self.class_name} - {self.division}"
         return self.class_name
     
 class Division(models.Model):
-    class_name = models.ForeignKey(Class, on_delete=models.CASCADE)
+    class_name = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='division_list')
     division = models.CharField(max_length=255)
     class_teacher_name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -54,8 +65,8 @@ class Designation(models.Model):
 class Subject(models.Model):
     subject_name = models.CharField(max_length=255)
     subject_type = models.CharField(max_length=255)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    class_name = models.ForeignKey(Class, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='subjects')
+    class_name = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='subjects')
 
     def __str__(self):
         return self.subject_name
@@ -70,9 +81,9 @@ class Admission(models.Model):
     gender = models.CharField(max_length=255)
     date_of_birth = models.DateField()
     place_of_birth = models.CharField(max_length=255)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    class_name = models.ForeignKey(Class, on_delete=models.CASCADE)
-    division = models.ForeignKey(Division, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='admissions')
+    class_name = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='admissions')
+    division = models.ForeignKey(Division, on_delete=models.CASCADE, related_name='admissions')
     address = models.TextField(max_length=255)
     district = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
@@ -112,9 +123,9 @@ class Admission(models.Model):
         return self.admission_number
     
 class ClassroomSetup(models.Model):
-    class_name = models.ForeignKey(Class, on_delete=models.CASCADE)
-    division = models.ForeignKey(Division, on_delete=models.CASCADE)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    class_name = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='classroom_setups')
+    division = models.ForeignKey(Division, on_delete=models.CASCADE, related_name='classroom_setups')
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='classroom_setups')
     status = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -131,13 +142,13 @@ class TeacherProfile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=255)
-    qualification = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=20)
-    address = models.TextField()
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    date_of_birth = models.DateField()
-    experience = models.CharField(max_length=255)
-    joining_date = models.DateField()
+    qualification = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='Male')
+    date_of_birth = models.DateField(blank=True, null=True)
+    experience = models.CharField(max_length=255, blank=True, null=True)
+    joining_date = models.DateField(blank=True, null=True)
     photo = models.ImageField(upload_to='teacher_photos', blank=True, null=True)
     subjects = models.ManyToManyField(Subject, related_name='teachers', blank=True)
 
