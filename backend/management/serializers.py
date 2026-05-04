@@ -138,6 +138,42 @@ class DivisionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AdmissionSerializer(serializers.ModelSerializer):
+    admission_date = serializers.DateField(required=False, allow_null=True)
+    date_of_birth = serializers.DateField(required=False, allow_null=True)
+    department = serializers.PrimaryKeyRelatedField(queryset=Department.objects.all(), required=False, allow_null=True)
+    class_name = serializers.PrimaryKeyRelatedField(queryset=Class.objects.all(), required=False, allow_null=True)
+    division = serializers.PrimaryKeyRelatedField(queryset=Division.objects.all(), required=False, allow_null=True)
+
     class Meta:
         model = Admission
         fields = '__all__'
+        extra_kwargs = {
+            'admission_number': {'required': False},
+            'first_name': {'required': False, 'allow_blank': True},
+            'last_name': {'required': False, 'allow_blank': True},
+            'gender': {'required': False, 'allow_blank': True},
+            'place_of_birth': {'required': False, 'allow_blank': True},
+            'address': {'required': False, 'allow_blank': True},
+            'district': {'required': False, 'allow_blank': True},
+            'state': {'required': False, 'allow_blank': True},
+            'post_office': {'required': False, 'allow_blank': True},
+            'blood_group': {'required': False, 'allow_blank': True},
+            'nationality': {'required': False, 'allow_blank': True},
+            'pin_code': {'required': False, 'allow_blank': True},
+            'aadhar_number': {'required': False, 'allow_blank': True},
+            'mother_tongue': {'required': False, 'allow_blank': True},
+            'religion': {'required': False, 'allow_blank': True},
+            'caste': {'required': False, 'allow_blank': True},
+            'category': {'required': False, 'allow_blank': True},
+            'academic_period': {'required': False, 'allow_blank': True},
+            'father_name': {'required': False, 'allow_blank': True},
+            'father_occupation': {'required': False, 'allow_blank': True},
+            'father_qualification': {'required': False, 'allow_blank': True},
+            'father_income': {'required': False, 'allow_blank': True},
+            'father_mobile': {'required': False, 'allow_blank': True},
+            'mother_name': {'required': False, 'allow_blank': True},
+            'mother_occupation': {'required': False, 'allow_blank': True},
+            'mother_qualification': {'required': False, 'allow_blank': True},
+            'mother_income': {'required': False, 'allow_blank': True},
+            'mother_mobile': {'required': False, 'allow_blank': True},
+        }

@@ -88,6 +88,14 @@ class AdmissionListCreateView(generics.ListCreateAPIView):
     serializer_class = AdmissionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def post(self, request, *args, **kwargs):
+        print("Incoming Admission Data:", request.data)
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            print("Admission Validation Errors:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return super().post(request, *args, **kwargs)
+
     def get_queryset(self):
         queryset = Admission.objects.all()
         class_id = self.request.query_params.get('class_id')
@@ -104,13 +112,18 @@ class AdmissionListCreateView(generics.ListCreateAPIView):
             serializer.save()
             return
             
-        # Teacher must be the assigned class teacher
-        if class_obj and class_obj.class_teacher == user:
+        # The assigned class teacher has access
+        if class_obj and class_obj.class_teacher and class_obj.class_teacher == user:
+            serializer.save()
+            return
+
+        # Any teacher in the Teacher group can also add admissions
+        if user.groups.filter(name='Teacher').exists():
             serializer.save()
             return
 
         from rest_framework.exceptions import PermissionDenied
-        raise PermissionDenied("Only an Admin or the assigned Class Teacher can add students to this class.")
+        raise PermissionDenied("Only an Admin or a Teacher can add students.")
 
 class SubjectListCreateView(generics.ListCreateAPIView):
     queryset = Subject.objects.all()

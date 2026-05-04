@@ -82,7 +82,6 @@ const Dashboard = () => {
     place_of_birth: "",
     department: "",
     class_name: "",
-    division: "",
     address: "",
     district: "",
     state: "",
@@ -201,7 +200,14 @@ const Dashboard = () => {
   };
 
   const handleAddDepartment = async () => {
-    if (!newDepartment) return;
+    if (!newDepartment) {
+      showAlert(
+        "error",
+        "Validation Error",
+        "Please provide a department name.",
+      );
+      return;
+    }
     try {
       await api.post("departments/", { department_name: newDepartment });
       setNewDepartment("");
@@ -209,11 +215,19 @@ const Dashboard = () => {
       showAlert("success", "Success", "Department added!");
     } catch (error) {
       console.error(error);
+      showAlert("error", "Error", "Failed to add department.");
     }
   };
 
   const handleAddClass = async () => {
-    if (!newClass.class_name || !newClass.department) return;
+    if (!newClass.class_name || !newClass.department) {
+      showAlert(
+        "error",
+        "Validation Error",
+        "Please fill in all class details (Name and Department).",
+      );
+      return;
+    }
     try {
       await api.post("classes/", newClass);
       setNewClass({ class_name: "", department: "" });
@@ -221,6 +235,7 @@ const Dashboard = () => {
       showAlert("success", "Success", "Class added!");
     } catch (error) {
       console.error(error);
+      showAlert("error", "Error", "Failed to add class.");
     }
   };
 
@@ -229,8 +244,14 @@ const Dashboard = () => {
       !newDivision.division ||
       !newDivision.class_name ||
       !newDivision.class_teacher_name
-    )
+    ) {
+      showAlert(
+        "error",
+        "Validation Error",
+        "Please fill in all division details (Division, Class Teacher, and Select Class).",
+      );
       return;
+    }
     try {
       await api.post("divisions/", newDivision);
       setNewDivision({ division: "", class_name: "", class_teacher_name: "" });
@@ -238,24 +259,52 @@ const Dashboard = () => {
       showAlert("success", "Success", "Division added!");
     } catch (error) {
       console.error(error);
+      showAlert("error", "Error", "Failed to add division.");
     }
   };
 
   return (
-    <Box>
-      <Container maxW="container.xl" py={10}>
+    <Box minH="100vh" py={10} px={4} bg="transparent">
+      <Container maxW="container.xl">
         <VStack spaceY={10} align="stretch">
-          <HStack justify="space-between">
-            <Heading
-              color="var(--primary-dark)"
-              display="flex"
-              alignItems="center"
-            >
-              <GraduationCap size={32} style={{ marginRight: "10px" }} />
-              School Management Dashboard
-            </Heading>
+          {/* Header */}
+          <HStack
+            justify="space-between"
+            className="glass-card"
+            p={6}
+            borderRadius="2xl"
+            transition="all 0.3s ease"
+          >
+            <HStack spaceX={4}>
+              <Box
+                p={3}
+                bg="var(--primary)"
+                color="white"
+                borderRadius="xl"
+                shadow="md"
+              >
+                <GraduationCap size={32} />
+              </Box>
+              <Heading
+                size="2xl"
+                fontWeight="800"
+                color="var(--primary-dark)"
+                letterSpacing="tight"
+              >
+                School Management Hub
+              </Heading>
+            </HStack>
             <Button
               variant="outline"
+              colorPalette="red"
+              borderRadius="xl"
+              px={6}
+              _hover={{
+                bg: "red.50",
+                transform: "translateY(-2px)",
+                shadow: "sm",
+              }}
+              transition="all 0.2s"
               onClick={() => {
                 localStorage.clear();
                 window.location.href = "/";
@@ -266,24 +315,46 @@ const Dashboard = () => {
           </HStack>
 
           <Box
-            p={6}
-            borderRadius="xl"
-            bg="white"
-            shadow="lg"
-            border="1px solid"
-            borderColor="var(--light-gray)"
+            p={8}
+            borderRadius="2xl"
+            className="glass-card"
+            transition="all 0.3s ease"
+            _hover={{ shadow: "var(--glass-shadow)" }}
           >
-            <VStack spaceY={6} align="stretch">
-              <Heading size="lg" color="var(--primary-dark)">
-                Add New Student Admission
-              </Heading>
+            <VStack spaceY={8} align="stretch">
+              <HStack
+                borderBottom="2px solid"
+                borderColor="var(--light-gray)"
+                pb={4}
+              >
+                <Box
+                  p={2}
+                  bg="blue.50"
+                  color="var(--primary)"
+                  borderRadius="lg"
+                >
+                  <UserCircle size={24} />
+                </Box>
+                <Heading size="xl" color="var(--primary-dark)" fontWeight="700">
+                  New Student Admission
+                </Heading>
+              </HStack>
               <form onSubmit={handleAddAdmission} noValidate>
                 <Tabs.Root
                   defaultValue="academic"
                   variant="enclosed"
                   colorPalette="blue"
                 >
-                  <Tabs.List overflowX="auto" whiteSpace="nowrap" mb={4}>
+                  <Tabs.List
+                    overflowX="auto"
+                    whiteSpace="nowrap"
+                    mb={6}
+                    borderBottom="none"
+                    p={1}
+                    bg="gray.100"
+                    borderRadius="xl"
+                    shadow="inner"
+                  >
                     <Tabs.Trigger value="academic">
                       <BookOpen size={16} /> Academic
                     </Tabs.Trigger>
@@ -306,39 +377,39 @@ const Dashboard = () => {
 
                   <Tabs.Content value="academic">
                     <SimpleGrid columns={{ base: 1, md: 3 }} gap={4} p={2}>
-                      <Field label="Admission Number" required>
+                      <Field label="Admission Number">
                         <Input
                           name="admission_number"
                           value={formData.admission_number}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="Admission Date" required>
+                      <Field label="Admission Date">
                         <Input
                           type="date"
                           name="admission_date"
                           value={formData.admission_date}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="Academic Period" required>
+                      <Field label="Academic Period">
                         <Input
                           name="academic_period"
                           value={formData.academic_period}
                           onChange={handleInputChange}
-                          required
+                         
                           placeholder="2024-2025"
                         />
                       </Field>
-                      <Field label="Department" required>
+                      <Field label="Department">
                         <NativeSelectRoot>
                           <NativeSelectField
                             name="department"
                             value={formData.department}
                             onChange={handleInputChange}
-                            required
+                           
                             items={metadata.departments.map((d) => ({
                               label: d.department_name,
                               value: d.id.toString(),
@@ -350,15 +421,17 @@ const Dashboard = () => {
                           </NativeSelectField>
                         </NativeSelectRoot>
                       </Field>
-                      <Field label="Class" required>
+                      <Field label="Class">
                         <NativeSelectRoot>
                           <NativeSelectField
                             name="class_name"
                             value={formData.class_name}
                             onChange={handleInputChange}
-                            required
+                           
                             items={metadata.classes.map((c) => ({
-                              label: c.class_name,
+                              label: c.division
+                                ? `${c.class_name} - ${c.division}`
+                                : c.class_name,
                               value: c.id.toString(),
                             }))}
                           >
@@ -368,35 +441,17 @@ const Dashboard = () => {
                           </NativeSelectField>
                         </NativeSelectRoot>
                       </Field>
-                      <Field label="Division" required>
-                        <NativeSelectRoot>
-                          <NativeSelectField
-                            name="division"
-                            value={formData.division}
-                            onChange={handleInputChange}
-                            required
-                            items={metadata.divisions.map((d) => ({
-                              label: d.division,
-                              value: d.id.toString(),
-                            }))}
-                          >
-                            <option value="" disabled>
-                              Select Division
-                            </option>
-                          </NativeSelectField>
-                        </NativeSelectRoot>
-                      </Field>
                     </SimpleGrid>
                   </Tabs.Content>
 
                   <Tabs.Content value="personal">
                     <SimpleGrid columns={{ base: 1, md: 3 }} gap={4} p={2}>
-                      <Field label="First Name" required>
+                      <Field label="First Name">
                         <Input
                           name="first_name"
                           value={formData.first_name}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
                       <Field label="Middle Name">
@@ -406,40 +461,40 @@ const Dashboard = () => {
                           onChange={handleInputChange}
                         />
                       </Field>
-                      <Field label="Last Name" required>
+                      <Field label="Last Name">
                         <Input
                           name="last_name"
                           value={formData.last_name}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="Gender" required>
+                      <Field label="Gender">
                         <NativeSelectRoot>
                           <NativeSelectField
                             name="gender"
                             value={formData.gender}
                             onChange={handleInputChange}
-                            required
+                           
                             items={["Male", "Female", "Other"]}
                           />
                         </NativeSelectRoot>
                       </Field>
-                      <Field label="Date of Birth" required>
+                      <Field label="Date of Birth">
                         <Input
                           type="date"
                           name="date_of_birth"
                           value={formData.date_of_birth}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="Place of Birth" required>
+                      <Field label="Place of Birth">
                         <Input
                           name="place_of_birth"
                           value={formData.place_of_birth}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
                       <Field label="Student Photo">
@@ -461,49 +516,49 @@ const Dashboard = () => {
                           Father's Details
                         </Text>
                         <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-                          <Field label="Father Name" required>
+                          <Field label="Father Name">
                             <Input
                               placeholder="Full Name"
                               name="father_name"
                               value={formData.father_name}
                               onChange={handleInputChange}
-                              required
+                             
                             />
                           </Field>
-                          <Field label="Occupation" required>
+                          <Field label="Occupation">
                             <Input
                               placeholder="Occupation"
                               name="father_occupation"
                               value={formData.father_occupation}
                               onChange={handleInputChange}
-                              required
+                             
                             />
                           </Field>
-                          <Field label="Qualification" required>
+                          <Field label="Qualification">
                             <Input
                               placeholder="Qualification"
                               name="father_qualification"
                               value={formData.father_qualification}
                               onChange={handleInputChange}
-                              required
+                             
                             />
                           </Field>
-                          <Field label="Annual Income" required>
+                          <Field label="Annual Income">
                             <Input
                               placeholder="Income"
                               name="father_income"
                               value={formData.father_income}
                               onChange={handleInputChange}
-                              required
+                             
                             />
                           </Field>
-                          <Field label="Mobile Number" required>
+                          <Field label="Mobile Number">
                             <Input
                               placeholder="Mobile"
                               name="father_mobile"
                               value={formData.father_mobile}
                               onChange={handleInputChange}
-                              required
+                             
                             />
                           </Field>
                           <Field label="Email Address">
@@ -522,49 +577,49 @@ const Dashboard = () => {
                           Mother's Details
                         </Text>
                         <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-                          <Field label="Mother Name" required>
+                          <Field label="Mother Name">
                             <Input
                               placeholder="Full Name"
                               name="mother_name"
                               value={formData.mother_name}
                               onChange={handleInputChange}
-                              required
+                             
                             />
                           </Field>
-                          <Field label="Occupation" required>
+                          <Field label="Occupation">
                             <Input
                               placeholder="Occupation"
                               name="mother_occupation"
                               value={formData.mother_occupation}
                               onChange={handleInputChange}
-                              required
+                             
                             />
                           </Field>
-                          <Field label="Qualification" required>
+                          <Field label="Qualification">
                             <Input
                               placeholder="Qualification"
                               name="mother_qualification"
                               value={formData.mother_qualification}
                               onChange={handleInputChange}
-                              required
+                             
                             />
                           </Field>
-                          <Field label="Annual Income" required>
+                          <Field label="Annual Income">
                             <Input
                               placeholder="Income"
                               name="mother_income"
                               value={formData.mother_income}
                               onChange={handleInputChange}
-                              required
+                             
                             />
                           </Field>
-                          <Field label="Mobile Number" required>
+                          <Field label="Mobile Number">
                             <Input
                               placeholder="Mobile"
                               name="mother_mobile"
                               value={formData.mother_mobile}
                               onChange={handleInputChange}
-                              required
+                             
                             />
                           </Field>
                           <Field label="Email Address">
@@ -623,46 +678,46 @@ const Dashboard = () => {
                     <SimpleGrid columns={{ base: 1, md: 2 }} gap={4} p={2}>
                       <Field
                         label="Current Address"
-                        required
+                       
                         gridColumn="span 2"
                       >
                         <Input
                           name="address"
                           value={formData.address}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="District" required>
+                      <Field label="District">
                         <Input
                           name="district"
                           value={formData.district}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="State" required>
+                      <Field label="State">
                         <Input
                           name="state"
                           value={formData.state}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="Post Office" required>
+                      <Field label="Post Office">
                         <Input
                           name="post_office"
                           value={formData.post_office}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="Pin Code" required>
+                      <Field label="Pin Code">
                         <Input
                           name="pin_code"
                           value={formData.pin_code}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
                     </SimpleGrid>
@@ -670,60 +725,60 @@ const Dashboard = () => {
 
                   <Tabs.Content value="additional">
                     <SimpleGrid columns={{ base: 1, md: 3 }} gap={4} p={2}>
-                      <Field label="Aadhar Number" required>
+                      <Field label="Aadhar Number">
                         <Input
                           name="aadhar_number"
                           value={formData.aadhar_number}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="Blood Group" required>
+                      <Field label="Blood Group">
                         <Input
                           name="blood_group"
                           value={formData.blood_group}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="Nationality" required>
+                      <Field label="Nationality">
                         <Input
                           name="nationality"
                           value={formData.nationality}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="Mother Tongue" required>
+                      <Field label="Mother Tongue">
                         <Input
                           name="mother_tongue"
                           value={formData.mother_tongue}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="Religion" required>
+                      <Field label="Religion">
                         <Input
                           name="religion"
                           value={formData.religion}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="Caste" required>
+                      <Field label="Caste">
                         <Input
                           name="caste"
                           value={formData.caste}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
-                      <Field label="Category" required>
+                      <Field label="Category">
                         <Input
                           name="category"
                           value={formData.category}
                           onChange={handleInputChange}
-                          required
+                         
                         />
                       </Field>
                     </SimpleGrid>
@@ -767,10 +822,18 @@ const Dashboard = () => {
                 <Button
                   type="submit"
                   mt={8}
-                  size="lg"
+                  size="xl"
+                  py={6}
                   bg="var(--primary)"
                   color="white"
-                  _hover={{ bg: "var(--primary-dark)" }}
+                  borderRadius="xl"
+                  shadow="lg"
+                  _hover={{
+                    bg: "var(--primary-dark)",
+                    transform: "translateY(-2px)",
+                    shadow: "xl",
+                  }}
+                  transition="all 0.3s ease"
                   w="100%"
                   disabled={loading}
                 >
@@ -778,8 +841,10 @@ const Dashboard = () => {
                     "Submitting..."
                   ) : (
                     <>
-                      <Save size={20} style={{ marginRight: "8px" }} />
-                      Submit Student Admission
+                      <Save size={22} style={{ marginRight: "10px" }} />
+                      <Text fontSize="lg" fontWeight="bold">
+                        Submit Student Admission
+                      </Text>
                     </>
                   )}
                 </Button>
@@ -788,19 +853,35 @@ const Dashboard = () => {
           </Box>
 
           <Box
-            p={6}
-            borderRadius="xl"
-            bg="white"
-            shadow="md"
-            border="1px solid"
-            borderColor="gray.100"
+            p={8}
+            borderRadius="2xl"
+            className="glass-card"
+            transition="all 0.3s ease"
+            _hover={{ shadow: "var(--glass-shadow)" }}
           >
-            <VStack spaceY={4} align="stretch">
-              <Heading size="md">Admitted Students List</Heading>
-              <Box overflowX="auto">
-                <Table.Root variant="outline" size="sm">
+            <VStack spaceY={6} align="stretch">
+              <HStack
+                borderBottom="2px solid"
+                borderColor="var(--light-gray)"
+                pb={4}
+              >
+                <Box p={2} bg="green.50" color="green.600" borderRadius="lg">
+                  <Users size={24} />
+                </Box>
+                <Heading size="xl" color="var(--primary-dark)" fontWeight="700">
+                  Admitted Students Directory
+                </Heading>
+              </HStack>
+              <Box
+                overflowX="auto"
+                borderRadius="xl"
+                border="1px solid"
+                borderColor="gray.100"
+                bg="white"
+              >
+                <Table.Root variant="outline" size="md">
                   <Table.Header>
-                    <Table.Row bg="gray.50">
+                    <Table.Row bg="gray.100">
                       <Table.ColumnHeader>Photo</Table.ColumnHeader>
                       <Table.ColumnHeader>Adm #</Table.ColumnHeader>
                       <Table.ColumnHeader>Name</Table.ColumnHeader>
@@ -830,17 +911,23 @@ const Dashboard = () => {
                         </Table.Cell>
                         <Table.Cell>{`${adm.first_name} ${adm.last_name}`}</Table.Cell>
                         <Table.Cell>
-                          {
-                            metadata.classes.find(
+                          {(() => {
+                            const cls = metadata.classes.find(
                               (c) => c.id === adm.class_name,
-                            )?.class_name
-                          }{" "}
-                          -{" "}
-                          {
-                            metadata.divisions.find(
+                            );
+                            const div = metadata.divisions.find(
                               (d) => d.id === adm.division,
-                            )?.division
-                          }
+                            );
+                            if (cls) {
+                              const classBase = cls.class_name;
+                              const classDiv =
+                                cls.division || (div ? div.division : "");
+                              return classDiv
+                                ? `${classBase} - ${classDiv}`
+                                : classBase;
+                            }
+                            return "N/A";
+                          })()}
                         </Table.Cell>
                         <Table.Cell>
                           {adm.father_mobile ||
@@ -863,36 +950,76 @@ const Dashboard = () => {
             </VStack>
           </Box>
           <Box
-            p={6}
-            borderRadius="xl"
-            bg="white"
-            shadow="md"
-            border="1px solid"
-            borderColor="gray.100"
+            p={8}
+            borderRadius="2xl"
+            className="glass-card"
+            transition="all 0.3s ease"
+            _hover={{ shadow: "var(--glass-shadow)" }}
           >
-            <VStack spaceY={4} align="stretch">
-              <Heading size="md" color="var(--primary-dark)">
-                System Setup (Metadata Control)
-              </Heading>
+            <VStack spaceY={6} align="stretch">
+              <HStack
+                borderBottom="2px solid"
+                borderColor="var(--light-gray)"
+                pb={4}
+              >
+                <Box p={2} bg="purple.50" color="purple.600" borderRadius="lg">
+                  <Info size={24} />
+                </Box>
+                <Heading size="xl" color="var(--primary-dark)" fontWeight="700">
+                  System Setup (Metadata Control)
+                </Heading>
+              </HStack>
               <SimpleGrid columns={{ base: 1, md: 3 }} gap={6}>
                 {/* Add Department */}
-                <VStack align="stretch" bg="gray.50" p={4} borderRadius="lg">
-                  <Text fontWeight="bold">Add Department</Text>
+                <VStack
+                  align="stretch"
+                  bg="white"
+                  border="1px solid"
+                  borderColor="gray.100"
+                  shadow="sm"
+                  p={6}
+                  borderRadius="xl"
+                  transition="all 0.2s"
+                  _hover={{ shadow: "md", transform: "translateY(-2px)" }}
+                >
+                  <Text fontWeight="800" color="gray.700">
+                    Add Department
+                  </Text>
                   <Input
                     placeholder="Department Name"
                     bg="white"
                     value={newDepartment}
                     onChange={(e) => setNewDepartment(e.target.value)}
                   />
-                  <Button colorPalette="blue" onClick={handleAddDepartment}>
+                  <Button
+                    mt={2}
+                    bg="var(--primary)"
+                    color="white"
+                    _hover={{ bg: "var(--primary-dark)" }}
+                    borderRadius="lg"
+                    shadow="sm"
+                    onClick={handleAddDepartment}
+                  >
                     <Plus size={16} style={{ marginRight: "8px" }} />
                     Create Dept
                   </Button>
                 </VStack>
 
                 {/* Add Class */}
-                <VStack align="stretch" bg="gray.50" p={4} borderRadius="lg">
-                  <Text fontWeight="bold">Add Class</Text>
+                <VStack
+                  align="stretch"
+                  bg="white"
+                  border="1px solid"
+                  borderColor="gray.100"
+                  shadow="sm"
+                  p={6}
+                  borderRadius="xl"
+                  transition="all 0.2s"
+                  _hover={{ shadow: "md", transform: "translateY(-2px)" }}
+                >
+                  <Text fontWeight="800" color="gray.700">
+                    Add Class
+                  </Text>
                   <Input
                     placeholder="Class Name (e.g. Grade 10)"
                     bg="white"
@@ -918,15 +1045,35 @@ const Dashboard = () => {
                       </option>
                     </NativeSelectField>
                   </NativeSelectRoot>
-                  <Button colorPalette="blue" onClick={handleAddClass}>
+                  <Button
+                    mt={2}
+                    bg="var(--primary)"
+                    color="white"
+                    _hover={{ bg: "var(--primary-dark)" }}
+                    borderRadius="lg"
+                    shadow="sm"
+                    onClick={handleAddClass}
+                  >
                     <Plus size={16} style={{ marginRight: "8px" }} />
                     Create Class
                   </Button>
                 </VStack>
 
                 {/* Add Division */}
-                <VStack align="stretch" bg="gray.50" p={4} borderRadius="lg">
-                  <Text fontWeight="bold">Add Division</Text>
+                <VStack
+                  align="stretch"
+                  bg="white"
+                  border="1px solid"
+                  borderColor="gray.100"
+                  shadow="sm"
+                  p={6}
+                  borderRadius="xl"
+                  transition="all 0.2s"
+                  _hover={{ shadow: "md", transform: "translateY(-2px)" }}
+                >
+                  <Text fontWeight="800" color="gray.700">
+                    Add Division
+                  </Text>
                   <Input
                     placeholder="Division (e.g. A)"
                     bg="white"
@@ -960,7 +1107,9 @@ const Dashboard = () => {
                         })
                       }
                       items={metadata.classes.map((c) => ({
-                        label: c.class_name,
+                        label: c.division
+                          ? `${c.class_name} - ${c.division}`
+                          : c.class_name,
                         value: c.id.toString(),
                       }))}
                     >
@@ -969,7 +1118,15 @@ const Dashboard = () => {
                       </option>
                     </NativeSelectField>
                   </NativeSelectRoot>
-                  <Button colorPalette="blue" onClick={handleAddDivision}>
+                  <Button
+                    mt={2}
+                    bg="var(--primary)"
+                    color="white"
+                    _hover={{ bg: "var(--primary-dark)" }}
+                    borderRadius="lg"
+                    shadow="sm"
+                    onClick={handleAddDivision}
+                  >
                     <Plus size={16} style={{ marginRight: "8px" }} />
                     Create Division
                   </Button>
